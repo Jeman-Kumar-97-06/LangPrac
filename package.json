@@ -1,0 +1,24 @@
+{
+  "name": "langchainprac",
+  "version": "1.0.0",
+  "description": "",
+  "main": "xtra.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@langchain/community": "^1.1.2",
+    "@langchain/core": "^1.1.11",
+    "@langchain/google-genai": "^2.1.6",
+    "@langchain/mongodb": "^1.1.0",
+    "dotenv": "^17.2.3",
+    "langchain": "^1.2.6",
+    "mongodb": "^7.0.0",
+    "nodemon": "^3.1.11",
+    "pdf-parse": "^1.1.4"
+  }
+}

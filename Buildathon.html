@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="https://h2svision.github.io/publicAssets/vision/favicon.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vision | Hack2skill</title>
+  <meta name="referrer" content="no-referrer" />
+  <script>
+    const domainConfigs = {
+      development: {
+        VITE_BASE_URL: "https://developmentvision.hack2skill.com"
+      },
+      staging: {
+        VITE_BASE_URL: "https://alphavision.hack2skill.com"
+      },
+      production: {
+        VITE_BASE_URL: "https://vision.hack2skill.com"
+      }
+    }
+
+    if (window.location.href.includes("developmentvision")) {
+      window.env = domainConfigs.development
+    } else if (window.location.href.includes("alphavision")) {
+      window.env = domainConfigs.staging
+    } else if (window.location.href.includes("localhost")) {
+      window.env = domainConfigs.development
+    } else {
+      window.env = domainConfigs.production
+    }
+  </script>
+
+  <!-- Google tag (gtag.js) -->
+  <script type="module" crossorigin src="/assets/vendor-4adab861.js"></script>
+  <script type="module" crossorigin src="/assets/ui-c19519e2.js"></script>
+  <script type="module" crossorigin src="/assets/redux-b77feee0.js"></script>
+  <script type="module" crossorigin src="/assets/router-3a462325.js"></script>
+  <script type="module" crossorigin src="/assets/index-e24ace2c.js"></script>
+  <link rel="stylesheet" href="/assets/style-d9f0a005.css">
+</head>
+
+<body>
+  <!-- Facebook Pixel Code -->
+  <!-- <script>
+    !(function (f, b, e, v, n, t, s) {
+      if (f.fbq) return
+      n = f.fbq = function () {
+        n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+      }
+      if (!f._fbq) f._fbq = n
+      n.push = n
+      n.loaded = !0
+      n.version = "2.0"
+      n.queue = []
+      t = b.createElement(e)
+      t.async = !0
+      t.src = v
+      s = b.getElementsByTagName(e)[0]
+      s.parentNode.insertBefore(t, s)
+    })(window, document, "script", "https://connect.facebook.net/en_US/fbevents.js")
+    fbq("init", "166375699032627")
+    fbq("track", "PageView")
+  </script>
+  <noscript>
+    <img height="1" width="1" src="https://www.facebook.com/tr?id=166375699032627&ev=PageView
+      &noscript=1" />
+  </noscript> -->
+  <!-- End Facebook Pixel Code -->
+
+  <div id="root"></div>
+  
+
+  <!-- WebEngage Scripts -->
+  <!-- <script id="_webengage_script_tag" type="text/javascript">
+    var webengage
+    !(function (w, e, b, n, g) {
+      function o(e, t) {
+        e[t[t.length - 1]] = function () {
+          r.__queue.push([t.join("."), arguments])
+        }
+      }
+      var i,
+        s,
+        r = w[b],
+        z = " ",
+        l = "init options track screen onReady".split(z),
+        a = "feedback survey notification".split(z),
+        c = "options render clear abort".split(z),
+        p = "Open Close Submit Complete View Click".split(z),
+        u = "identify login logout setAttribute".split(z)
+      if (!r || !r.__v) {
+        for (
+          w[b] = r =
+          {
+            __queue: [],
+            is_spa: 1, //Change this to 0 if you do not wish to use default SPA behaviour of WebEngage SDK
+            __v: "6.0",
+            user: {}
+          },
+          i = 0;
+          i < l.length;
+          i++
+        )
+          o(r, [l[i]])
+        for (i = 0; i < a.length; i++) {
+          for (r[a[i]] = {}, s = 0; s < c.length; s++) o(r[a[i]], [a[i], c[s]])
+          for (s = 0; s < p.length; s++) o(r[a[i]], [a[i], "on" + p[s]])
+        }
+        for (i = 0; i < u.length; i++) o(r.user, ["user", u[i]])
+        setTimeout(function () {
+          var f = e.createElement("script"),
+            d = e.getElementById("_webengage_script_tag")
+            ; (f.type = "text/javascript"),
+              (f.async = !0),
+              (f.src =
+                ("https:" == e.location.protocol
+                  ? "https://widgets.in.webengage.com"
+                  : "http://widgets.in.webengage.com") + "/js/webengage-min-v-6.0.js"),
+              d.parentNode.insertBefore(f, d)
+        })
+      }
+    })(window, document, "webengage")
+    webengage.init("in~76aa221")
+  </script> -->
+  <!-- WebEngage Scripts Ends-->
+
+  <!-- Google Tag Manger Scripts -->
+  <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-5Q9Z5VDQBQ"></script>
+  <script async>
+    if (
+      window?.env?.VITE_BASE_URL.includes("developmentvision") ||
+      window?.env?.VITE_BASE_URL.includes("alphavision")
+    ) {
+      setTimeout(() => {
+        window.dataLayer = window.dataLayer || []
+        function gtag() {
+          dataLayer.push(arguments)
+        }
+        gtag("js", new Date())
+
+        gtag("config", "G-B80RFKC9CR")
+        console.log("Google tag loaded")
+      }, 100)
+    } else {
+      setTimeout(() => {
+        window.dataLayer = window.dataLayer || []
+        function gtag() {
+          dataLayer.push(arguments)
+        }
+        gtag("js", new Date())
+        console.log("Google tag loaded Production")
+        gtag("config", "G-5Q9Z5VDQBQ")
+      }, 100)
+    }
+  </script>
+  <script async>
+    if (
+      window?.env?.VITE_BASE_URL.includes("developmentvision") ||
+      window?.env?.VITE_BASE_URL.includes("alphavision")
+    ) {
+      function loadGTM() {
+        ; (function (w, d, s, l, i) {
+          w[l] = w[l] || []
+          w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" })
+          var f = d.getElementsByTagName(s)[0],
+            j = d.createElement(s),
+            dl = l != "dataLayer" ? "&l=" + l : ""
+          j.async = true
+          j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl
+          f.parentNode.insertBefore(j, f)
+        })(window, document, "script", "dataLayer", "GTM-TZJSHHLB")
+        console.log("Google load gtm loaded")
+      }
+      setTimeout(loadGTM, 200)
+    } else {
+      ; (function (w, d, s, l, i) {
+        w[l] = w[l] || []
+        w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" })
+        var f = d.getElementsByTagName(s)[0],
+          j = d.createElement(s),
+          dl = l != "dataLayer" ? "&l=" + l : ""
+        j.async = true
+        j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl
+        f.parentNode.insertBefore(j, f)
+      })(window, document, "script", "dataLayer", "GTM-NTB8KBDP")
+      console.log("Google load gtm loaded Production")
+      // Set a timeout to delay the GTM script loading
+      setTimeout(loadGTM, 200)
+    }
+  </script> -->
+  <!-- Google Tag Manger Scripts Ends -->
+
+  <!-- Recaptcha Scripts -->
+  <script async src="https://www.google.com/recaptcha/api.js?render=6LeR30YqAAAAACAagX2yNnJWxPfCZu30Rp2a_w-d"></script>
+  <script async src="https://www.google.com/recaptcha/api.js" async defer></script>
+  <!-- Recaptcha Scripts Ends-->
+
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NTB8KBDP" height="0" width="0"
+      style="display: none; visibility: hidden"></iframe></noscript>
+  <script defer src="js/gt.min.js" data-gt-widget-id="43217984"></script>
+
+  <!-- Google Translator -->
+  <script defer type="text/javascript">
+    window.gtranslateSettings = window.gtranslateSettings || {}
+    window.gtranslateSettings["43217984"] = {
+      default_language: "en",
+      languages: [
+        "af",
+        "sq",
+        "am",
+        "en",
+        "fa",
+        "ar",
+        "ps",
+        "ja",
+        "zh-CN",
+        "hy",
+        "az",
+        "eu",
+        "be",
+        "bn",
+        "bs",
+        "bg",
+        "ca",
+        "ceb",
+        "ny",
+        "zh-TW",
+        "co",
+        "hr",
+        "cs",
+        "da",
+        "nl",
+        "eo",
+        "et",
+        "tl",
+        "fi",
+        "fr",
+        "fy",
+        "gl",
+        "ka",
+        "de",
+        "el",
+        "gu",
+        "ht",
+        "ha",
+        "haw",
+        "iw",
+        "hi",
+        "hmn",
+        "hu",
+        "is",
+        "ig",
+        "id",
+        "ga",
+        "it",
+        "jw",
+        "kn",
+        "kk",
+        "km",
+        "ko",
+        "ku",
+        "ky",
+        "lo",
+        "la",
+        "lv",
+        "lt",
+        "lb",
+        "mk",
+        "mg",
+        "ms",
+        "ml",
+        "mt",
+        "mi",
+        "mr",
+        "mn",
+        "my",
+        "ne",
+        "no",
+        "pl",
+        "pt",
+        "pa",
+        "ro",
+        "ru",
+        "sm",
+        "gd",
+        "sr",
+        "st",
+        "sn",
+        "sd",
+        "si",
+        "sk",
+        "sl",
+        "so",
+        "es",
+        "su",
+        "sw",
+        "sv",
+        "tg",
+        "ta",
+        "te",
+        "th",
+        "tr",
+        "uk",
+        "ur",
+        "uz",
+        "vi",
+        "cy",
+        "xh",
+        "yi",
+        "yo",
+        "zu"
+      ],
+      wrapper_selector: "#gt-mordadam-43217984",
+      native_language_names: 1,
+      flag_style: "2d",
+      flag_size: 24,
+      horizontal_position: "inline",
+      flags_location: "flags\/"
+    }
+  </script>
+  <!-- Google Translator Ends-->
+
+</body>
+
+</html>
