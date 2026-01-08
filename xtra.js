@@ -38,6 +38,6 @@ const vectorStore = new MongoDBAtlasVectorSearch(embeddings,{
 
 const x = await vectorStore.addDocuments(allSplits);
 
-const res = await vectorStore.similaritySearch('what is the iphone model?');
+const res = await vectorStore.similaritySearch('How much aluminium is used in iphone 16e ?');
 console.log(res);
 await client.close();
