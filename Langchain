@@ -1,0 +1,179 @@
+Semantic Search :
+    Document Loader : Document loaders provide standard interface for reading data from different sources like slack, notion or GDrive into Langchain's Document format. This ensures that the data can be handled consistently regardless of the source. Supports both 'Load all docs at once' and 'stream docs lazily from big ass datasets'
+
+    Embedding : The process of turning Plain text to vectors.
+
+    Vector Store : A specialized DB used to store numerical vector embeddings.
+
+    Example : Let's work on a PDF Parsing
+    
+        * Loading the document : we need 2 npm packages '@langchain/community' and 'pdf-parse'
+            $ npm install @langchain/community pdf-parse
+            
+        * How the documents will be formatted :
+            >> import {Document} from '@langchain
+            >> const documents = [
+            >>    new Document({
+            >>        pageContent:"Dogs are a great companions, known for their loyalty and friendliness.",
+            >>        metadata   :{source:"mammal-pets-doc"},
+            >>    }),
+            >>    new Document({
+            >>        pageContent:"Cats are independent pets that often enjoy their own space."
+            >>        metadata   :{source:"mammal-pets-doc"},
+            >>    }),
+            >> ]
+        
+        * Parsing a PDF and creating langchain readable docs like the above : Mind You, This just Reads what's in the PDF.
+            >> import {PDFLoader} from '@langchain/community/document_loaders/fd/pdf';
+            >> const loader = new PDFLoader('./some.pdf');
+            >> const docs   = await loader.load();
+            >> console.log(docs);
+            >> console.log(docs.length);
+            
+        * Splitting text in chunks of 1000 chars and creating an overlap of 200 chars :
+            >> import {RecursiveCharacterTextSplitter} from '@langchain/textsplitters';
+            >> const textSplitter = new RecursiveCharacterTextSplitter({
+            >>    chunkSize : 1000,
+            >>    chunkOverlap : 200,
+            >> });
+            >> const allSplits = await textSplitter.splitDocuments(docs);
+            >> console.log(allSplits.length);
+            >> console.log(allSplits);
+            
+        * Now, Let's convert the chunks to vector embeddings: 
+            $ npm install @langchain/google-genai
+            
+            >> import {GoogleGenerativeAIEmbeddings} from '@langchain/google-genai';
+            >> const embeddings = new GoogleGenerativeAIEmbeddings({
+            >>                            model : 'text-embeddings-004',
+            >>                    });
+            >> const vector1 = await embeddings.embedQuery(allSplits[0].pageContent);
+            >> const vector2 = await embeddings.embedQuery(allSplits[1].pageContent);
+            >> assert vector1.length === vector2.length;
+            >> console.log(`Generated vectors of length: ${vector1.length}\n`);
+            >> console.log(vector1.slice(0,10));
+            
+            # OUTPUT: 
+              Generated vectors of length 1536
+              [-0.008586574345827103, -0.03341241180896759, -0.008936782367527485, -0.0036674530711025, 0.010564599186182022, 0.009598285891115665, 
+              -0.028587326407432556, -0.015824200585484505, 0.0030416189692914486, -0.012899317778646946]
+              
+              
+        * Storing the embeddings in a vector store:
+            $ npm install @langchain/mongodb
+            
+            >> import {MongoDBAtlasVectorSearch} from '@langchain/mongodb';
+            >> import {MongoClient} from 'mongodb';
+            >> const client      = new MongoClient(process.env.MONGODB_ATLAS_URI || "");
+            >> const collection  = client.db(process.env.MONGODB_ATLAS_DB_NAME).collection(process.env.MONGO_ATLAS_COLLECTION_NAME);
+            >> const vectorStore = new MongoDBAtlasVectorSearch(embeddings,{
+            >>                            collection:collection,
+            >>                            indexName :'vector_index',
+            >>                            textKey   :'text',
+            >>                            embeddingKey:'embedding',
+            >>                     });
+            
+            * Now, youv'e setup the vectorStore above. You can save the embeddings using the following line : 
+            >> await vectorStore.addDocuments(allSplits);
+            
+        * Retrievers : These get the relevant docs related to a question you ask : 
+              Type 1 :
+                  * Takes your text query.
+                  * Embeds it using the embedding model.
+                  * DB Embeds the query. Not your code.
+                  * Compares it against stored embeddings.
+                  * Returns the most similar docs (chunks).
+                  * Used for Fast, simple Semantic search using a text query.
+                  >> const results = await vectorStore.similaritySearch("What percent of alluminium is used in iphone 16e?");
+                  >> console.log(resuts[0]);
+              Type 2 :  
+                  * Takes a precomputed embedding vector. You convert the text to embedding manually.
+                  * You pass only the raw embedding vector.
+                  * Vector DB returns matches plus the similarity scores.
+                  * Useful when you want to reuse a vector.
+                  * Useful when you want similarity score for filtering.
+                  * Useful when chaining multi-step embedding logic.
+                  
+                  >> const questionEmbeddings = await embeddings.embedQuery("What percent of aluminium is used in iphone 16e?");
+                  >> const result = await vectorStore.similaritySearchVectorWithScore(embedding,1);
+                  >> console.log(result[0]);
+                  
+              Type 3 :
+                  * Supports MMR search. 
+                  * Normally in Type1 and Type2 it gives all relevant docs. But, MMR search says,
+                         "Give me chunks that are both relevant and different from each other"
+                  * Supports batch search. i.e., searches for multiple queries in parallel 
+                  * Useful for multi agent systems.
+                  * Useful for LLM pipelines.
+                  * Useful for RAG.
+                  * Useful for multiple queries at once.
+                  >> const retriever = vectorStore.asRetriever({searchType:'mmr',searchKwargs:{fetchK:1,},});
+                  >> const res       = await vectorStore.batch(["What phone are we talkin about?","How much cobalt in the phone"]);
+RAG Agent :
+    * One of the most powerful use of LLMs is creating question answering chatbots. These apps give answers about specific source information. These use a technique called 'Retrieval Augumented Generation'. 
+    * Indexing : A pipeline for ingesting data from a source and indexing it. This usually happens in a seperate process.
+        * Includes, converting plain text to embedding vectors.
+        * Saving the vectors to a vecto db
+        * Create a vector index for fast retrieval.
+    * Retrieval & Generation : 
+        * Retrival includes finding docs that are most relevant to the user's query.
+        * Retrieval is important becoz LLM may not know what's happening in the world currently. It only knows what it's trained on. 
+        * Generation is a process where the LLM uses the retrieved info from docs and creates the right answer.
+        * Generation is important to prevent LLM from hallucinating. Without R & AG, LLM will not know any new info and it will start hallucinating and making up
+        facts.
+
+    * Creating a RAG chatbot:
+        $ npm install @langchain/google-genai
+        >> import {initChatModel} from 'langchain';
+        
+        * Select a Chat model:
+        >> const model = await intChatModel("google-genai:gemini-2.5-flash-lite");
+        
+        * Select an embeddings model : 
+        >> import {GoogleGenerativeAIEmbeddings} from '@langchain/google-genai';
+        >> const embeddings = new GoogleGenerativeAIEmbeddings({model:"gemini-embedding-001"});
+        
+        * Select a Vector Store:
+        $ npm install @langchain/mongodb
+        
+        >> import { MongoDBAtlasVectorSearch } from '@langchain/mongodb';
+        >> improt { MongoClient } from 'mongodb';
+        >> const client = new MongoClient(process.env.MONGODB_URL || '');
+        >> const collection=client.db(process.env.MONGO_DB_NAME).collection(process.env.MONGO_COLLECTION_NAME);
+        >> const vectorStore=new MongoDBAtlasVectorSearch(embeddings,{collection:collection,indexName:'vector_test_index',textKey:"text",embeddingsKey:'embedd'})
+        
+        *Loading Documents : 
+        >> import 'cheerio';
+        >> import {CheerioWebBaseLoader} from '@langchain/community/document_loaders/web/cheerio';
+        >> const pTagSelector = 'p';
+        >> const cheerioLoader = new CheerioWebBaseLoader('https://shitblog.io/posts/batman',{selector:pTagSelector});
+        >> const docs = await cheerioLoader.load();
+        >> console.assert(docs.length = 1);
+        >> console.log(docs);
+        
+        *Splitting Docs : 
+        >> import {RecursiveCharacterTextSplitter} from '@langchain/textsplitters';
+        >> const splitter = new RecursiveCharacterTextSplitter({chunkSize:1000,chunkOverlap:200});
+        >> const allSplits= await splitter.splitDocuments(docs);
+        
+        *Create Embeddings and store them in vector db:
+        >> await vectorStore.addDocuments(allSplits);
+        
+        *Retrieval and Generation:
+        >> import * as z from 'zod'
+        >> import {tool} from '@langchain/core/tools';
+        >> const retrieveSchema = z.object({query:z.string()});
+        >> const retrieve = tool(
+        >>    async ({query}) => {
+        >>        const retrievedDocs = await vectorStore.similaritySearch(query,2);
+        >>        const serialized    = retrievedDocs.map(doc=>`Source ${doc.metadata.source}\nContent: ${doc.text}).join('\n');
+        >>        return [serialized,retrievedDocs];
+        >>    },
+        >>    {
+        >>        name:'retrieve',
+        >>        description:'Retrieve information related to a query',
+        >>        schema:retrieveSchema,
+        >>        responseFormat:'content_and_artifact',
+        >>     }
+        >>> );
+        
